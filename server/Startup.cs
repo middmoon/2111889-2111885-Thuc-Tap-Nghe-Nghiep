@@ -38,7 +38,8 @@ namespace server
                     builder
                         .WithOrigins("http://localhost:3000")
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
 
@@ -59,6 +60,8 @@ namespace server
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowAllOrigins");
 
             app.UseRouting();
 
