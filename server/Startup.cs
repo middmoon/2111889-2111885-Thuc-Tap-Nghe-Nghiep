@@ -1,90 +1,90 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
-
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using server.Data;
+using server.Services;
+using System;
 
 namespace server
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Load .env ngay cả trong ConfigureServices để debug
+            DotNetEnv.Env.Load();
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
+            Console.WriteLine($"DB_CONNECTION in Startup: {connectionString}");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("DB_CONNECTION not found in .env file.");
+            }
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
 
             services.AddControllers();
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins", builder =>
-                {
-                    builder
-                        .WithOrigins("http://localhost:3000")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
-            });
-
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "server", Version = "v1" });
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Server API", Version = "v1" });
             });
+
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            Console.WriteLine($"JWT_KEY: {jwtKey}");
+            var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+            Console.WriteLine($"JWT_ISSUER: {jwtIssuer}");
+            var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+            Console.WriteLine($"JWT_AUDIENCE: {jwtAudience}");
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtIssuer,
+                        ValidAudience = jwtAudience,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                    };
+                });
+
+            services.AddScoped<IAuthService, AuthService>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "server v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server API v1"));
             }
 
             app.UseHttpsRedirection();
-
-            app.UseCors("AllowAllOrigins");
-
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-
-                // Thêm route mặc định "/" trả về một thông báo
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Welcome to API Server ASP.NET Core");
-                });
-            });
-
-
         }
     }
 }
