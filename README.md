@@ -10,13 +10,17 @@ Cài đặt lại các package của dự án ASP .NET
 ```powershell
 dotnet restore
 ```
+Cài đặt **dotnet ef** của Entity Framework Tool
+```powershell
+dotnet tool install --global dotnet-ef
+```
 Chạy server **Chạy default ở port 5000 5001**
 ```powershell
 dotnet run
 ```
 
 ### 🛠 2. **client React - Ant Design**
-Di chuyển vào thư mục server
+Di chuyển vào thư mục client
 ```powershell
 cd client 
 ```
