@@ -1,5 +1,5 @@
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Button,
   Checkbox,
@@ -13,12 +13,29 @@ import {
 import { Data } from "../data/data";
 import dayjs from "dayjs";
 const Test = () => {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "https://localhost:5001/WeatherForecast"
+        );
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        console.log("Data fetched successfully:", data);
+      }
+    };
+
+    fetchData();
+  }, []);
   const columns = [
     {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      render: (date) => dayjs(date).format("YYYY-MM-DD HH:mm"), // Định dạng ngày giờ
+      render: (date) => dayjs(date).format("YYYY-MM-DD HH:mm"),
     },
     {
       title: "Temperature (°C)",
@@ -39,78 +56,35 @@ const Test = () => {
           summary === "Freezing"
             ? "blue"
             : summary === "Bracing"
+            ? "cyan"
+            : summary === "Chilly"
+            ? "purple"
+            : summary === "Cool"
+            ? "geekblue"
+            : summary === "Mild"
+            ? "green"
+            : summary === "Warm"
+            ? "orange"
+            : summary === "Balmy"
+            ? "gold"
+            : summary === "Hot"
+            ? "volcano"
+            : summary === "Sweltering"
             ? "red"
-            : "green";
+            : summary === "Scorching"
+            ? "magenta"
+            : "default";
         return <Tag color={color}>{summary}</Tag>;
       },
     },
   ];
-  const onFinish = (values) => {
-    console.log("Success:", values);
-  };
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+
   return (
     <>
       <div style={{ maxWidth: 800, margin: "50px auto" }}>
         <h2 style={{ textAlign: "center" }}>Weather Forecast</h2>
-        <Table columns={columns} dataSource={Data} rowKey="date" />
+        <Table columns={columns} dataSource={data} rowKey="date" />
         <Form />
-      </div>
-      <div className="w-full flex items-center justify-center">
-        <Form
-          name="basic"
-          labelCol={{
-            span: 8,
-          }}
-          wrapperCol={{
-            span: 16,
-          }}
-          className="w-[700px] h-[200px] p-4"
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-        >
-          <Form.Item
-            label="Username"
-            name="username"
-            rules={[
-              {
-                required: true,
-                message: "Please input your username!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: "Please input your password!",
-              },
-            ]}
-          >
-            <Input.Password />
-          </Form.Item>
-
-          <Form.Item name="remember" valuePropName="checked" label={null}>
-            <Checkbox>Remember me</Checkbox>
-          </Form.Item>
-
-          <Form.Item label={null}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
       </div>
     </>
   );
