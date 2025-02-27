@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import withLayout from "../../layout/withLayout";
+import { useNavigate } from "react-router-dom";
 import { Flex, Form, Input, Button } from "antd";
 import axios from "axios";
 import { motion } from "framer-motion";
 
 const Register = () => {
   const [openError, setOpenError] = useState(false);
+  const navigate = useNavigate();
   //register method
   const onFinish = async (values) => {
     try {
@@ -15,6 +17,7 @@ const Register = () => {
         { withCredentials: true }
       );
       console.log("Response:", response.data);
+      navigate("/login");
     } catch (error) {
       setOpenError(true);
       console.error("Error:", error);
