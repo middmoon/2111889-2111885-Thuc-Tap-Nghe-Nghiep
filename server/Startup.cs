@@ -39,9 +39,11 @@ namespace server
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowLocalOrigins",
-                    builder => builder.AllowAnyOrigin()
-                                      .AllowAnyMethod()
-                                      .AllowAnyHeader());
+                    builder => builder
+                                .WithOrigins("http://localhost:3000")
+                                .AllowCredentials()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
             });
 
             services
@@ -86,10 +88,10 @@ namespace server
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server API v1"));
             }
+            app.UseCors("AllowLocalOrigins");
 
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseCors("AllowLocalOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
 

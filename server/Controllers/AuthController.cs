@@ -99,12 +99,12 @@ namespace server.Controllers
       Response.Cookies.Append("token", token, new CookieOptions
       {
         HttpOnly = true,
-        Secure = true,
+        Secure = false,
         SameSite = SameSiteMode.Strict,
         Expires = DateTime.UtcNow.AddDays(10)
       });
 
-      return Ok(new { token = token });
+      return Ok(new { token = token, user = user.Username, roles = userRoles });
     }
   }
 
