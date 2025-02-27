@@ -39,7 +39,7 @@ namespace server
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowLocalOrigins",
-                    builder => builder
+                    policy => policy
                                 .WithOrigins("http://localhost:3000")
                                 .AllowCredentials()
                                 .AllowAnyMethod()
@@ -82,13 +82,13 @@ namespace server
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCors("AllowLocalOrigins");
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Server API v1"));
             }
-            app.UseCors("AllowLocalOrigins");
 
             app.UseHttpsRedirection();
             app.UseRouting();

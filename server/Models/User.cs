@@ -7,8 +7,10 @@ namespace server.Models
 {
   public class User
   {
+    [JsonIgnore]
     public int Id { get; set; }
     public string Username { get; set; }
+    [JsonIgnore]
     public string PasswordHash { get; set; }
     [JsonIgnore]
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();

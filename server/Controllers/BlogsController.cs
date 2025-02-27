@@ -10,7 +10,7 @@ using server.Models;
 
 namespace server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/blog")]
     [ApiController]
     public class BlogsController : ControllerBase
     {
