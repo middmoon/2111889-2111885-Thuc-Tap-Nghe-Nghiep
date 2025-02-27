@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 export const Header = () => {
   const [currentUser, setCurrentUser] = useState(null);
+
   const navigate = useNavigate();
   //fetch user name
   useEffect(() => {
@@ -21,6 +22,12 @@ export const Header = () => {
     window.addEventListener("userUpdated", handleUserUpdate);
     return () => window.removeEventListener("userUpdated", handleUserUpdate);
   }, []);
+  //logout
+  const handleLogout = () => {
+    sessionStorage.removeItem("userData");
+    window.dispatchEvent(new Event("userUpdated"));
+    navigate("/");
+  };
 
   return (
     <>
@@ -34,7 +41,10 @@ export const Header = () => {
           </p>
           {currentUser ? (
             <>
-              <div>{currentUser.user}</div>
+              <div className="flex gap-3 items-center justify-center">
+                <div>{currentUser.user}</div>
+                <Button onClick={handleLogout}>Đăng xuất</Button>
+              </div>
             </>
           ) : (
             <Flex gap="small" wrap>
