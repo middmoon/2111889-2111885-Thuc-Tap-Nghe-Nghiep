@@ -36,23 +36,29 @@ namespace server
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowLocalOrigins",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyMethod()
+                                      .AllowAnyHeader());
+            });
+
             services
                 .AddControllers()
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                    options.JsonSerializerOptions.ReferenceHandler = null;
                 });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Server API", Version = "v1" });
             });
 
             var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-            // Console.WriteLine($"JWT_KEY: {jwtKey}");
             var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-            // Console.WriteLine($"JWT_ISSUER: {jwtIssuer}");
             var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-            // Console.WriteLine($"JWT_AUDIENCE: {jwtAudience}");
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -83,6 +89,7 @@ namespace server
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors("AllowLocalOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
 

@@ -104,5 +104,7 @@ namespace server.Data
         optionsBuilder.UseSqlServer(connectionString);
       }
     }
+
+    public DbSet<server.Models.Blog> Blog { get; set; }
   }
 }
