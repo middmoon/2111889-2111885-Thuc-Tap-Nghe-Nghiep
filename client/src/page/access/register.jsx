@@ -1,13 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import withLayout from "../../layout/withLayout";
 import { Flex, Form, Input, Button } from "antd";
-const onFinish = (values) => {
-  console.log("Success:", values);
-};
-const onFinishFailed = (errorInfo) => {
-  console.log("Failed:", errorInfo);
-};
+import axios from "axios";
+import { motion } from "framer-motion";
+
 const Register = () => {
+  const [openError, setOpenError] = useState(false);
+  //register method
+  const onFinish = async (values) => {
+    try {
+      const response = await axios.post(
+        "https://localhost:5001/api/auth/register",
+        values
+      );
+      console.log("Response:", response.data);
+    } catch (error) {
+      setOpenError(true);
+      console.error("Error:", error);
+      setTimeout(() => {
+        setOpenError(false);
+      }, 2000);
+    }
+  };
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
   return (
     <>
       <div className="w-full flex justify-center items-center p-3">
@@ -22,10 +39,12 @@ const Register = () => {
           <Form
             name="basic"
             labelCol={{
-              span: 8,
+              xs: { span: 24 },
+              sm: { span: 8 },
             }}
             wrapperCol={{
-              span: 16,
+              xs: { span: 24 },
+              sm: { span: 16 },
             }}
             style={{
               maxWidth: 700,
@@ -70,6 +89,17 @@ const Register = () => {
             </Form.Item>
           </Form>
         </Flex>
+        {openError && (
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true, amount: 0.3 }}
+            className="absolute max-h-[40px] bottom-10 left-3/2 md:top-20 md:right-10 px-4 py-2 bg-red-500 text-white rounded-md"
+          >
+            Lỗi đăng ký
+          </motion.div>
+        )}
       </div>
     </>
   );
