@@ -1,13 +1,14 @@
 import React from "react";
-import Test from "./test";
+import withLayout from "../layout/withLayout";
+import ArticlesPage from "../component/articles ";
 const Home = () => {
   return (
-    <home>
-      <div className="">
-        <Test />
+    <div className="w-full flex flex-col justify-center items-center">
+      <div className=" max-w-[1500px] w-full">
+        <ArticlesPage />
       </div>
-    </home>
+    </div>
   );
 };
 
-export default Home;
+export default withLayout(Home);

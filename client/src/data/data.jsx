@@ -30,3 +30,59 @@ export const Data = [
     summary: "Balmy",
   },
 ];
+
+export const articles = [
+  {
+    title: "Khám phá thiết kế để ứng tuyển vị trí UI Designer",
+    date: "11 Tháng 1, 2022",
+    description:
+      "Bạn có đam mê với UI Design nhưng chưa có cơ hội làm việc trong dự án thực tế? Đừng lo, việc liên tục tìm hiểu và khám phá các xu hướng thiết kế mới, thực hành trên các dự án cá nhân, và xây dựng một portfolio chuyên nghiệp có thể giúp bạn nổi bật trong mắt nhà tuyển dụng. Trong bài viết này, chúng ta sẽ cùng nhau tìm hiểu những kỹ năng cần thiết để ứng tuyển vào vị trí UI Designer.",
+    image: "/assets/featured1.jpg",
+  },
+  {
+    title:
+      "Có thể điều bạn cần lúc này không phải luyện tập mà là dấn thân vào ngành",
+    date: "27 Tháng 3, 2022",
+    description:
+      "Rất nhiều nhà thiết kế trẻ dành hàng giờ để học các công cụ như Figma, Adobe XD, hay Photoshop nhưng lại chưa từng tham gia vào một dự án thực tế. Việc luyện tập là quan trọng, nhưng dấn thân vào ngành bằng cách tham gia các dự án nhỏ, làm việc freelance hoặc thực tập có thể giúp bạn có kinh nghiệm thực tế và cải thiện kỹ năng nhanh chóng hơn.",
+    image: "/assets/featured2.jpg",
+  },
+  {
+    title: "Quy trình tạo bố cục và sắp xếp thành phần trong UI Design",
+    date: "15 Tháng 2, 2022",
+    description:
+      "Một giao diện người dùng (UI) tốt không chỉ là đẹp mà còn phải có cấu trúc logic, giúp người dùng dễ dàng điều hướng và trải nghiệm mượt mà. Việc sử dụng lưới (grid system), khoảng cách hợp lý giữa các thành phần, và nguyên tắc phân cấp thông tin (hierarchy) là những yếu tố quan trọng giúp thiết kế của bạn trở nên chuyên nghiệp hơn.",
+    image: "/assets/featured3.jpg",
+  },
+  {
+    title: "Cân nhắc về thương hiệu trước khi thêm yếu tố delightful",
+    date: "8 Tháng 3, 2022",
+    description:
+      "Yếu tố delightful (gây thích thú) trong thiết kế UI/UX là một cách để tạo ra trải nghiệm thú vị cho người dùng. Tuy nhiên, trước khi áp dụng các hiệu ứng động, màu sắc tươi sáng hay các yếu tố tương tác sáng tạo, bạn cần đảm bảo rằng thương hiệu của bạn đã được xây dựng vững chắc và có định hướng rõ ràng để không làm mất đi sự nhất quán trong thiết kế.",
+    image: "/assets/featured4.jpg",
+  },
+  {
+    title: "5 nguyên tắc thiết kế UX giúp tăng trải nghiệm người dùng",
+    date: "20 Tháng 4, 2022",
+    description:
+      "Thiết kế UX không chỉ là về việc làm cho giao diện đẹp mắt mà còn giúp người dùng dễ dàng hoàn thành mục tiêu của họ. Trong bài viết này, chúng ta sẽ khám phá 5 nguyên tắc quan trọng trong UX Design như: đơn giản hóa (simplicity), tính nhất quán (consistency), phản hồi nhanh (feedback), dễ tiếp cận (accessibility), và trực quan (intuitiveness).",
+    image: "/assets/featured5.jpg",
+  },
+  {
+    title:
+      "Những lỗi phổ biến khi thiết kế giao diện người dùng và cách khắc phục",
+    date: "5 Tháng 5, 2022",
+    description:
+      "Một trong những thách thức lớn nhất khi thiết kế UI là tránh những lỗi có thể làm giảm trải nghiệm người dùng. Một số lỗi phổ biến bao gồm: sử dụng quá nhiều màu sắc, typography không rõ ràng, không tối ưu hóa cho thiết bị di động, hoặc không cung cấp đủ phản hồi cho người dùng. Trong bài viết này, chúng ta sẽ cùng phân tích những lỗi này và cách khắc phục chúng.",
+    image: "/assets/featured6.jpg",
+  },
+];
+
+export const imageList = [
+  "/assets/home/asian.webp",
+  "/assets/home/high.webp",
+  "/assets/home/tarnical2.webp",
+  "/assets/home/tartical.webp",
+  "/assets/home/working.webp",
+  "/assets/home/working2.webp",
+];
