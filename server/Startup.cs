@@ -27,7 +27,7 @@ namespace server
             // Load .env ngay cả trong ConfigureServices để debug
             DotNetEnv.Env.Load();
             var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
-            // Console.WriteLine($"DB_CONNECTION in Startup: {connectionString}");
+            Console.WriteLine($"DB_CONNECTION in Startup: {connectionString}");
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException("DB_CONNECTION not found in .env file.");
