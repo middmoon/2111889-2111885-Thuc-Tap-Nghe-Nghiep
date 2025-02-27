@@ -1,18 +1,23 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import withLayout from "../../layout/withLayout";
 import { Flex, Form, Input, Button } from "antd";
 import axios from "axios";
 import { motion } from "framer-motion";
 const Login = () => {
   const [openError, setOpenError] = useState(false);
+  const navigate = useNavigate();
   //Login method
   const onFinish = async (values) => {
     try {
       const response = await axios.post(
         "https://localhost:5001/api/auth/login",
-        values
+        values,
+        { withCredentials: true }
       );
       console.log("Response:", response.data);
+      sessionStorage.setItem("userData", JSON.stringify(response.data));
+      navigate("/");
     } catch (error) {
       setOpenError(true);
       console.error("Error:", error);

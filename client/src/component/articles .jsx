@@ -17,6 +17,14 @@ const shuffleArray = (array) => {
 const ArticlesPage = () => {
   //state
   const [randomImages, setRandomImages] = useState([]);
+  //get cookie
+  function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+  }
+  const accessToken = getCookie("token");
+  console.log("accessToken: ", accessToken);
   //Effect, API call
   useEffect(() => {
     const shuffledImages = shuffleArray(imageList).slice(0, articles.length);

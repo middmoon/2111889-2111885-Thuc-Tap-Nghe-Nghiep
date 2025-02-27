@@ -11,7 +11,8 @@ const Register = () => {
     try {
       const response = await axios.post(
         "https://localhost:5001/api/auth/register",
-        values
+        values,
+        { withCredentials: true }
       );
       console.log("Response:", response.data);
     } catch (error) {
