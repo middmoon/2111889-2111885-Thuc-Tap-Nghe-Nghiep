@@ -4,12 +4,15 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel;
+using System.Collections.Generic;
 
 namespace server.Services
 {
   public interface IAuthService
   {
-    string GenerateJwtToken(User user);
+    string GenerateJwtToken(User user, string[] roles);
   }
 
   public class AuthService : IAuthService
@@ -25,23 +28,29 @@ namespace server.Services
       _jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
     }
 
-    public string GenerateJwtToken(User user)
+    public string GenerateJwtToken(User user, string[] roles)
     {
-      var claims = new[]
+
+      var claims = new List<Claim>
       {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
-            };
+        new Claim("id", user.Id.ToString())
+      };
+
+      foreach (var role in roles ?? Array.Empty<string>())
+      {
+        claims.Add(new Claim("roles", role));
+      }
 
       var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
       var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
       var token = new JwtSecurityToken(
-          issuer: _jwtIssuer,
-          audience: _jwtAudience,
+          // issuer: _jwtIssuer,
+          // audience: _jwtAudience,
           claims: claims,
-          expires: DateTime.Now.AddHours(1),
-          signingCredentials: creds);
+          expires: DateTime.Now.AddDays(10),
+          signingCredentials: creds
+      );
 
       return new JwtSecurityTokenHandler().WriteToken(token);
     }

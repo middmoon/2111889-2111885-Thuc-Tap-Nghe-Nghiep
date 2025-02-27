@@ -27,7 +27,7 @@ namespace server
             // Load .env ngay cả trong ConfigureServices để debug
             DotNetEnv.Env.Load();
             var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
-            Console.WriteLine($"DB_CONNECTION in Startup: {connectionString}");
+            // Console.WriteLine($"DB_CONNECTION in Startup: {connectionString}");
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException("DB_CONNECTION not found in .env file.");
@@ -36,18 +36,23 @@ namespace server
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-            services.AddControllers();
+            services
+                .AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "Server API", Version = "v1" });
             });
 
             var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
-            Console.WriteLine($"JWT_KEY: {jwtKey}");
+            // Console.WriteLine($"JWT_KEY: {jwtKey}");
             var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-            Console.WriteLine($"JWT_ISSUER: {jwtIssuer}");
+            // Console.WriteLine($"JWT_ISSUER: {jwtIssuer}");
             var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-            Console.WriteLine($"JWT_AUDIENCE: {jwtAudience}");
+            // Console.WriteLine($"JWT_AUDIENCE: {jwtAudience}");
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
