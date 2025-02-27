@@ -98,13 +98,20 @@ namespace server.Controllers
 
       Response.Cookies.Append("token", token, new CookieOptions
       {
-        HttpOnly = true,
+        HttpOnly = false,
         Secure = true,
         SameSite = SameSiteMode.None,
         Expires = DateTime.UtcNow.AddDays(10)
       });
 
       return Ok(new { token = token, user = user.Username, roles = userRoles });
+    }
+
+    [HttpDelete("lougout")]
+    public IActionResult Logout()
+    {
+      Response.Cookies.Delete("token");
+      return Ok();
     }
   }
 

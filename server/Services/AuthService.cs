@@ -38,15 +38,15 @@ namespace server.Services
 
       foreach (var role in roles ?? Array.Empty<string>())
       {
-        claims.Add(new Claim("roles", role));
+        claims.Add(new Claim(ClaimTypes.Role, role));
       }
 
       var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
       var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
       var token = new JwtSecurityToken(
-          // issuer: _jwtIssuer,
-          // audience: _jwtAudience,
+          issuer: _jwtIssuer,
+          audience: _jwtAudience,
           claims: claims,
           expires: DateTime.Now.AddDays(10),
           signingCredentials: creds

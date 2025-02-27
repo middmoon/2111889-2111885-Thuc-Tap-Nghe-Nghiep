@@ -10,6 +10,7 @@ using System.Text;
 using server.Data;
 using server.Services;
 using System;
+using System.Security.Claims;
 
 namespace server
 {
@@ -27,7 +28,7 @@ namespace server
             // Load .env ngay cả trong ConfigureServices để debug
             DotNetEnv.Env.Load();
             var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION");
-            Console.WriteLine($"DB_CONNECTION in Startup: {connectionString}");
+            // Console.WriteLine($"DB_CONNECTION in Startup: {connectionString}");
             if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException("DB_CONNECTION not found in .env file.");
@@ -71,11 +72,18 @@ namespace server
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtIssuer,
-                        ValidAudience = jwtAudience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                        ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                        ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")))
                     };
                 });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "admin"));
+                options.AddPolicy("Reader", policy => policy.RequireClaim(ClaimTypes.Role, "reader"));
+                options.AddPolicy("Writer", policy => policy.RequireClaim(ClaimTypes.Role, "writer"));
+            });
 
             services.AddScoped<IAuthService, AuthService>();
         }
