@@ -33,7 +33,7 @@ namespace server.Services
 
       var claims = new List<Claim>
       {
-        new Claim("id", user.Id.ToString())
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
       };
 
       foreach (var role in roles ?? Array.Empty<string>())

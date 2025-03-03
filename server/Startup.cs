@@ -83,6 +83,7 @@ namespace server
                 options.AddPolicy("Admin", policy => policy.RequireClaim(ClaimTypes.Role, "admin"));
                 options.AddPolicy("Reader", policy => policy.RequireClaim(ClaimTypes.Role, "reader"));
                 options.AddPolicy("Writer", policy => policy.RequireClaim(ClaimTypes.Role, "writer"));
+                options.AddPolicy("AdminOrWriter", policy => policy.RequireClaim(ClaimTypes.Role, "admin", "writer"));
             });
 
             services.AddScoped<IAuthService, AuthService>();

@@ -38,6 +38,12 @@ namespace server.Data
         .WithOne(b => b.Author)
         .OnDelete(DeleteBehavior.SetNull);
 
+      modelBuilder.Entity<Blog>()
+        .HasOne(b => b.Author)
+        .WithMany(u => u.Blogs)
+        .HasForeignKey(b => b.AuthorId)
+        .OnDelete(DeleteBehavior.SetNull);
+
       // Seed roles
       var adminRole = new Role { Id = 1, Name = "admin" };
       var readerRole = new Role { Id = 2, Name = "reader" };
