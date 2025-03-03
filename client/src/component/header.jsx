@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Button, Flex } from "antd";
 import { useNavigate } from "react-router-dom";
-
+import { getCookie } from "../layout/cookie";
 export const Header = () => {
   const [currentUser, setCurrentUser] = useState(null);
-
   const navigate = useNavigate();
+
   //fetch user name
   useEffect(() => {
     const fetchUser = () => {

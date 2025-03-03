@@ -102,3 +102,18 @@ const ticlesPage = () => {
 };
 
 export default ticlesPage;
+// const Test = async () => {
+//   try {
+//     const headers = {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${accessToken}`,
+//     };
+//     const response = await axios.get(
+//       "https://localhost:5001/api/test/protected/reader",
+//       { withCredentials: true, headers: headers }
+//     );
+//     console.log("Response:", response.data);
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// };
