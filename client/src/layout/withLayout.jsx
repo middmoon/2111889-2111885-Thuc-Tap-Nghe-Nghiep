@@ -1,3 +1,4 @@
+import Footer from "../component/footer";
 import { Header } from "../component/header";
 
 const withLayout = (WrappedComponent) => {
@@ -7,6 +8,7 @@ const withLayout = (WrappedComponent) => {
       <main className="min-h-screen">
         <WrappedComponent {...props} />
       </main>
+      <Footer />
     </>
   );
 };

@@ -86,3 +86,10 @@ export const imageList = [
   "/assets/home/working.webp",
   "/assets/home/working2.webp",
 ];
+
+export const blogData = {
+  title: "Khám phá thiết kế để ứng tuyển vị trí UI Designer",
+  date: "11 Tháng 1, 2022",
+  content:
+    "Mat Voyce’s work isn’t just visual—it moves, breathes, and interacts with its audience. As a type designer and animator renowned for his kinetic typography, Mat needed a website that did more than display his portfolio. It had to feel alive, mirroring his movement and personality to every project. When we took on the challenge of redesigning matvoyce.tv, we knew a standard portfolio layout wouldn’t cut it. His work is bold, dynamic, and utterly unique—so the website needed to be just that. Our goal was clear: create a digital space showcasing Mat’s diverse projects while ensuring that the site became an extension of his creativity. Rather than forcing all of his work into a single framework, we built three distinct layouts Transitions between sections had to feel seamless, so we implemented smooth scrolling, custom cursors, and bespoke media player controls to make the experience intuitive and engaging. Bringing Mat Voyce’s signature kinetic typography to the web was a unique challenge. Our goal was to preserve the impact of large-scale animated lettering while ensuring smooth performance and seamless motion. Mat’s animated typography extends beyond traditional layouts. To maintain proportionality across different screen sizes, we implemented a dynamic scaling system that automatically adjusts text ratios, ensuring a fluid visual experience across all devices.",
+};
