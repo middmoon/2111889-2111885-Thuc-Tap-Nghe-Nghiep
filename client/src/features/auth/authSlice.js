@@ -1,41 +1,43 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "../../utils/axiosClient";
+import axiosClient from "../../utils/axiosClient";
 
 export const loginUser = createAsyncThunk("auth/login", async (credentials, { rejectWithValue }) => {
   try {
-    const response = await axios.post("/auth/login", credentials);
+    const response = await axiosClient.post("/auth/login", credentials);
     localStorage.setItem("token", response.data.token);
     sessionStorage.setItem("userData", JSON.stringify(response.data));
-    return response.data.user;
+    return true;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || "Login failed");
   }
 });
 
 export const logoutUser = createAsyncThunk("auth/logout", async () => {
-  await axios.post("/auth/logout");
+  await axiosClient.post("/auth/logout");
   localStorage.removeItem("token");
+  sessionStorage.removeItem("userData");
 });
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: { user: null, isAuthenticated: false, status: "idle", error: null },
+  initialState: { isAuthenticated: false, status: "idle", error: null },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload;
         state.isAuthenticated = true;
         state.status = "succeeded";
       })
       .addCase(loginUser.rejected, (state, action) => {
-        state.user = null;
         state.isAuthenticated = false;
         state.error = action.payload;
       })
       .addCase(logoutUser.fulfilled, (state) => {
-        state.user = null;
         state.isAuthenticated = false;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isAuthenticated = true;
+        state.error = action.payload;
       });
   },
 });

@@ -1,46 +1,60 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import withLayout from "../../layout/withLayout";
 import { Flex, Form, Input, Button } from "antd";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../features/auth/authSlice";
+
 const Login = () => {
   const [openError, setOpenError] = useState(false);
   const navigate = useNavigate();
   //Login method
-  const onFinish = async (values) => {
-    try {
-      const response = await axios.post(
-        "https://localhost:5001/api/auth/login",
-        values,
-        { withCredentials: true }
-      );
-      console.log("Response:", response.data);
-      sessionStorage.setItem("userData", JSON.stringify(response.data));
-      navigate("/");
-    } catch (error) {
-      setOpenError(true);
-      console.error("Error:", error);
-      setTimeout(() => {
-        setOpenError(false);
-      }, 2000);
-    }
+  // const onFinish = async (values) => {
+  //   try {
+  //     const response = await axios.post("https://localhost:5001/api/auth/login", values, { withCredentials: true });
+  //     console.log("Response:", response.data);
+  //     sessionStorage.setItem("userData", JSON.stringify(response.data));
+  //     navigate("/");
+  //   } catch (error) {
+  //     setOpenError(true);
+  //     console.error("Error:", error);
+  //     setTimeout(() => {
+  //       setOpenError(false);
+  //     }, 2000);
+  //   }
+  // };
+
+  // use React Hooks
+  const dispatch = useDispatch();
+  const { isAuthenticated, status, error } = useSelector((state) => state.auth);
+
+  const onFinish = (values) => {
+    dispatch(loginUser(values));
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (error) {
+      setOpenError(true);
+      setTimeout(() => setOpenError(false), 3000);
+    }
+  }, [error]);
+
   return (
     <>
       <div className="flex justify-center items-center p-3">
-        <Flex
-          vertical
-          justify="center"
-          align="center"
-          className="p-7 rounded-md "
-          style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
-        >
+        <Flex vertical justify="center" align="center" className="p-7 rounded-md " style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}>
           <p className="pb-5 text-[25px]">Đăng nhập</p>
           <Form
             name="basic"
