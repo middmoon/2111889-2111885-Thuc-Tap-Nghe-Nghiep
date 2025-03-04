@@ -13,7 +13,7 @@ export const loginUser = createAsyncThunk("auth/login", async (credentials, { re
 });
 
 export const logoutUser = createAsyncThunk("auth/logout", async () => {
-  await axiosClient.post("/auth/logout");
+  await axiosClient.delete("/auth/logout");
   localStorage.removeItem("token");
   sessionStorage.removeItem("userData");
 });
@@ -25,17 +25,21 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.fulfilled, (state, action) => {
+        console.log("Đng nhập thành công");
         state.isAuthenticated = true;
         state.status = "succeeded";
       })
       .addCase(loginUser.rejected, (state, action) => {
+        console.log("Đăng nhập thất bại");
         state.isAuthenticated = false;
         state.error = action.payload;
       })
       .addCase(logoutUser.fulfilled, (state) => {
+        console.log("Đăng xuất thành công");
         state.isAuthenticated = false;
       })
       .addCase(logoutUser.rejected, (state, action) => {
+        console.log("Đăng xuất thất bại");
         state.isAuthenticated = true;
         state.error = action.payload;
       });

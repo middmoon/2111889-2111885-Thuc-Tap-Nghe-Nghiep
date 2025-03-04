@@ -96,22 +96,22 @@ namespace server.Controllers
 
       var token = _authService.GenerateJwtToken(user, userRoles);
 
-      Response.Cookies.Append("token", token, new CookieOptions
-      {
-        HttpOnly = false,
-        Secure = true,
-        SameSite = SameSiteMode.None,
-        Expires = DateTime.UtcNow.AddDays(10)
-      });
+      // Response.Cookies.Append("token", token, new CookieOptions
+      // {
+      //   HttpOnly = false,
+      //   Secure = true,
+      //   SameSite = SameSiteMode.None,
+      //   Expires = DateTime.UtcNow.AddDays(10)
+      // });
 
       return Ok(new { token = token, user = user.Username, roles = userRoles });
     }
 
-    [HttpDelete("lougout")]
+    [HttpDelete("logout")]
     public IActionResult Logout()
     {
-      Response.Cookies.Delete("token");
-      return Ok();
+      // Response.Cookies.Delete("token");
+      return Ok(new { message = "Đăng xuất thành công" });
     }
   }
   public class LoginModel

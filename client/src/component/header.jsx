@@ -3,7 +3,6 @@ import { Button, Flex } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDevice } from "../hooks/useDevice";
 import MobileHeader from "./mobile/headerMobile";
-import { axiosClient } from "../utils/axiosClient";
 import { logoutUser } from "../features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -45,14 +44,9 @@ export const Header = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
+    setCurrentUser(null);
     navigate("/");
   };
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setCurrentUser(null);
-    }
-  }, [isAuthenticated]);
 
   return (
     <>
