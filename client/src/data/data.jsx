@@ -85,6 +85,14 @@ export const imageList = [
   "/assets/home/tartical.webp",
   "/assets/home/working.webp",
   "/assets/home/working2.webp",
+  "/assets/home/porttrail.webp",
+  "/assets/home/ceo.jpg",
+  "/assets/home/ceo1.jpg",
+  "/assets/home/ceo1.jpg",
+  "/assets/home/1480.jpg",
+  "/assets/home/1480.jpg",
+  "/assets/home/1480.jpg",
+  "/assets/home/1480.jpg",
 ];
 
 export const blogData = {

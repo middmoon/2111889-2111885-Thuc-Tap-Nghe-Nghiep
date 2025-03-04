@@ -1,9 +1,11 @@
 import React from "react";
 import { Layout, Card, Row, Col, Typography, Image } from "antd";
+import { format } from "date-fns";
 import { articles } from "../data/data";
 import { motion } from "framer-motion";
 import { imageList } from "../data/data";
 import { useState, useEffect } from "react";
+import axios from "axios";
 const { Title, Text } = Typography;
 const shuffleArray = (array) => {
   let shuffled = [...array];
@@ -19,11 +21,35 @@ const ArticlesPage = () => {
   const [randomImages, setRandomImages] = useState([]);
 
   //Effect, API call
+  const [blogs, setBlogs] = useState([]);
+
+  const fetchBlogs = async () => {
+    try {
+      const response = await axios.get("https://localhost:5001/api/blogs");
+      setBlogs(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy dữ liệu blog:", error);
+    }
+  };
+  //fetch blog
   useEffect(() => {
-    const shuffledImages = shuffleArray(imageList).slice(0, articles.length);
+    fetchBlogs();
+  }, []);
+  //fetch random img
+  useEffect(() => {
+    let extendedImageList = [...imageList];
+    while (extendedImageList.length < blogs.length - 2) {
+      extendedImageList = [...extendedImageList, ...imageList];
+    }
+    const shuffledImages = shuffleArray(extendedImageList).slice(
+      0,
+      blogs.length - 2
+    );
     setRandomImages(shuffledImages);
   }, []);
+
   //Log test
+  console.log(blogs);
   return (
     <>
       <div className="w-full h-[2px] bg-gray-300 mb-5" />
@@ -46,9 +72,14 @@ const ArticlesPage = () => {
             }
           >
             <Text type="secondary">Kungai ,</Text>
-            <Text type="secondary">{articles[0].date}</Text>
-            <Title level={4}>{articles[0].title}</Title>
-            <Text>{articles[0].description}</Text>
+            <Text type="secondary">
+              {blogs[0]?.createdAt
+                ? format(new Date(blogs[0].createdAt), "yyyy-MM-dd")
+                : "N/A"}
+            </Text>
+
+            <Title level={4}>{blogs[9]?.title}</Title>
+            <Text>{blogs[9]?.content}</Text>
           </Card>
         </motion.div>
 
@@ -63,7 +94,7 @@ const ArticlesPage = () => {
             msOverflowStyle: "none",
           }}
         >
-          {articles.map((article, index) => (
+          {blogs.slice(2).map((article, index) => (
             <div
               key={index}
               className="flex flex-col sm:flex-row items-center gap-3 border p-3 "
@@ -77,11 +108,16 @@ const ArticlesPage = () => {
 
               {/* Nội dung bài viết */}
               <div className="w-full sm:w-[calc(100%-160px)] flex flex-col justify-center">
-                <Text type="secondary">{article.date}</Text>
+                <Text type="secondary">
+                  {" "}
+                  {article?.createdAt
+                    ? format(new Date(article.createdAt), "yyyy-MM-dd")
+                    : "N/A"}
+                </Text>
                 <Title level={4} className="text-lg sm:text-xl">
                   {article.title}
                 </Title>
-                <Text className="line-clamp-3">{article.description}</Text>
+                <Text className="line-clamp-3">{article.content}</Text>
               </div>
             </div>
           ))}
