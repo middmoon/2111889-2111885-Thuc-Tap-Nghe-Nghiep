@@ -49,7 +49,7 @@ const ArticlesPage = () => {
   }, []);
 
   //Log test
-  console.log(blogs);
+
   return (
     <>
       <div className="w-full h-[2px] bg-gray-300 mb-5" />

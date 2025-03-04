@@ -54,7 +54,13 @@ const Login = () => {
   return (
     <>
       <div className="flex justify-center items-center p-3">
-        <Flex vertical justify="center" align="center" className="p-7 rounded-md " style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}>
+        <Flex
+          vertical
+          justify="center"
+          align="center"
+          className="p-7 rounded-md "
+          style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
+        >
           <p className="pb-5 text-[25px]">Đăng nhập</p>
           <Form
             name="basic"
