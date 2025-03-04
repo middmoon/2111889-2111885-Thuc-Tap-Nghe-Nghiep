@@ -4,6 +4,8 @@ import Home from "./page/home";
 import Login from "./page/access/login";
 import Register from "./page/access/register";
 import PostDetail from "./page/PostDetail";
+import Counter from "./features/counter/counter";
+
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import CreatePost from "./page/createPost";
 function App() {
@@ -17,7 +19,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/test" element={<Test />} />
           <Route path="/Detail" element={<PostDetail />} />
-          <Route path="/create-post" element={<CreatePost />} />
+          <Route path="/redux-counter" element={<Counter />} />
         </Routes>
       </Router>
     </div>
