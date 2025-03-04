@@ -168,7 +168,7 @@ namespace server.Controllers
             return _context.Blog.Any(e => e.Id == id);
         }
 
-        private Boolean checkOwner(Blog blog, int userId)
+        private bool checkOwner(Blog blog, int userId)
         {
             return blog.AuthorId == userId;
         }
@@ -185,7 +185,6 @@ namespace server.Controllers
         public string Title { get; set; }
         public string Content { get; set; }
     }
-
 
     public class BlogFormat
     {
