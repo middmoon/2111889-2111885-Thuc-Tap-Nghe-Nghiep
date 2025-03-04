@@ -4,7 +4,6 @@ import axiosClient from "../../utils/axiosClient";
 export const loginUser = createAsyncThunk("auth/login", async (credentials, { rejectWithValue }) => {
   try {
     const response = await axiosClient.post("/auth/login", credentials);
-    localStorage.setItem("token", response.data.token);
     sessionStorage.setItem("userData", JSON.stringify(response.data));
     return true;
   } catch (error) {

@@ -10,8 +10,9 @@ const axiosClient = axios.create({
 });
 
 const getToken = () => {
-  const token = localStorage.getItem("token");
-  return token ? token : null;
+  const storedUser = sessionStorage.getItem("userData");
+  const token = storedUser ? storedUser.token : null;
+  return token;
 };
 
 axiosClient.interceptors.request.use(
