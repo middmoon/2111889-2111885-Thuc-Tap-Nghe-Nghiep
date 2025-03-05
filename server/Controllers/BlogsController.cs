@@ -27,16 +27,18 @@ namespace server.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Policy = "AdminOrWriter")]
         [HttpPost]
-        public async Task<ActionResult<Blog>> PostBlog(BlogPostModel model)
+        public async Task<ActionResult<Blog>> PostBlog(BlogModel model)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
-            if (userIdClaim == null)
-            {
-                return Unauthorized("User id not found in token.");
-            }
+            if (userIdClaim == null) return Unauthorized("User id not found in token.");
 
             int userId = int.Parse(userIdClaim.Value);
+
+            if (string.IsNullOrEmpty(model.Title) || string.IsNullOrEmpty(model.Content))
+            {
+                return BadRequest("Title and Content are required.");
+            }
 
             var blog = new Blog
             {
@@ -48,7 +50,16 @@ namespace server.Controllers
             };
 
             _context.Blog.Add(blog);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
 
             return CreatedAtAction("GetBlog", new { id = blog.Id }, blog);
         }
@@ -64,6 +75,7 @@ namespace server.Controllers
                     Title = b.Title,
                     Content = b.Content,
                     Author = b.Author.Username,
+                    Likes = b.LikedUsers.Count(ulb => ulb.BlogId == b.Id),
                     CreatedAt = b.CreatedAt,
                     UpdatedAt = b.UpdatedAt
                 })
@@ -76,43 +88,155 @@ namespace server.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Blog>> GetBlog(int id)
         {
-            var blog = await _context.Blog.FindAsync(id);
+            var blog = await _context.Blog
+                .Where(b => b.Id == id)
+                .Select(b => new BlogFormat
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Content = b.Content,
+                    Author = b.Author.Username,
+                    Likes = b.LikedUsers.Count(),
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt
+                })
+                .FirstOrDefaultAsync();
 
             if (blog == null)
             {
-                return NotFound();
+                return NotFound($"Blog with ID {id} not found.");
             }
 
-            return blog;
+            return Ok(blog);
         }
 
         // PUT: api/blogs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-
         [Authorize(Policy = "Writer")]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutBlog(int id, Blog blog)
+        public async Task<IActionResult> PutBlog(int id, BlogModel blog)
         {
-            if (id != blog.Id)
-            {
-                return BadRequest();
-            }
-
+            // Check claim NameIdentifier in token
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
-            if (userIdClaim == null)
-            {
-                return Unauthorized("User id not found in token.");
-            }
+            if (userIdClaim == null) return Unauthorized("User id not found in token.");
 
             int userId = int.Parse(userIdClaim.Value);
 
-            if (!checkOwner(blog, userId))
+            // Check existing user
+            var existingUser = await _context.Users.FindAsync(userId);
+
+            if (existingUser == null) return Unauthorized("User not found.");
+
+            // Check existing blog
+            var existingBlog = await _context.Blog.FindAsync(id);
+
+            if (existingBlog == null) return NotFound($"Blog with ID {id} not found.");
+
+            // Check the owner of the blog
+            if (!checkOwner(existingBlog, userId)) return Unauthorized("You are not the owner of this blog.");
+
+            // Check if blog is approved
+            if (existingBlog.IsApproved) return BadRequest("Blog is already approved.");
+
+            // update blog
+            if (blog.Title != null) existingBlog.Title = blog.Title;
+
+            if (blog.Content != null) existingBlog.Content = blog.Content;
+
+            existingBlog.UpdatedAt = DateTime.UtcNow;
+
+            // mark blog as modified
+            _context.Entry(existingBlog).State = EntityState.Modified;
+
+            // save changes
+            try
             {
-                return Unauthorized("You are not the owner of this blog.");
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BlogExists(id))
+                {
+                    return NotFound($"Blog with ID {id} not found.");
+                }
+                else
+                {
+                    throw;
+                }
             }
 
-            _context.Entry(blog).State = EntityState.Modified;
+            return Ok(existingBlog);
+        }
+
+        [Authorize]
+        [HttpPut("like/{id}")]
+        public async Task<IActionResult> LikeBlog(int id)
+        {
+            // check claim NameIdentifier in token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null) return Unauthorized("User id not found in token.");
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            // check existing blog
+            if (!BlogExists(id)) return NotFound($"Blog with ID {id} not found.");
+
+            var existingBlog = await _context.Blog.FindAsync(id);
+
+            // check if user already liked blog
+            if (existingBlog.LikedUsers.Any(ulb => ulb.UserId == userId)) return BadRequest("You already liked this blog.");
+
+            // like blog
+            var userLikeBlog = new UserLikeBlog
+            {
+                UserId = userId,
+                BlogId = id
+            };
+
+            _context.UserLikeBlogs.Add(userLikeBlog);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (!BlogExists(id))
+                {
+                    return NotFound($"Blog with ID {id} not found.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(existingBlog);
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpPut("approve/{id}")]
+        public async Task<IActionResult> ApproveBlog(int id)
+        {
+            // check admin role
+            var isAdmin = User.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value.Equals("admin", StringComparison.OrdinalIgnoreCase));
+            if (!isAdmin) return Unauthorized("Only admins can approve blogs.");
+
+            // check existing blog
+            if (!BlogExists(id)) return NotFound($"Blog with ID {id} not found.");
+
+            var existingBlog = await _context.Blog.FindAsync(id);
+
+            // check if blog is already approved
+            if (existingBlog.IsApproved) return BadRequest("Blog is already approved.");
+
+            // approve blog
+            existingBlog.IsApproved = true;
+
+            //mark blog as modified
+            _context.Entry(existingBlog).State = EntityState.Modified;
 
             try
             {
@@ -122,7 +246,7 @@ namespace server.Controllers
             {
                 if (!BlogExists(id))
                 {
-                    return NotFound();
+                    return NotFound($"Blog with ID {id} not found.");
                 }
                 else
                 {
@@ -130,7 +254,7 @@ namespace server.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(existingBlog);
         }
 
         // DELETE: api/blogs/5
@@ -174,13 +298,7 @@ namespace server.Controllers
         }
     }
 
-    public class BlogPostModel
-    {
-        public string Title { get; set; }
-        public string Content { get; set; }
-    }
-
-    public class BlogPutModel
+    public class BlogModel
     {
         public string Title { get; set; }
         public string Content { get; set; }
@@ -192,6 +310,7 @@ namespace server.Controllers
         public string Title { get; set; }
         public string Content { get; set; }
         public string Author { get; set; }
+        public int Likes { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

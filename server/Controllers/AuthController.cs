@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using server.Models;
 using server.Services;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace server.Controllers
@@ -113,6 +115,7 @@ namespace server.Controllers
       // Response.Cookies.Delete("token");
       return Ok(new { message = "Đăng xuất thành công" });
     }
+
   }
   public class LoginModel
   {

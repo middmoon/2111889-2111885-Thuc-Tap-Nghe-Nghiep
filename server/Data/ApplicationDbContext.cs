@@ -15,6 +15,9 @@ namespace server.Data
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
 
+    public DbSet<UserLikeBlog> UserLikeBlogs { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       base.OnModelCreating(modelBuilder);
@@ -43,6 +46,21 @@ namespace server.Data
         .WithMany(u => u.Blogs)
         .HasForeignKey(b => b.AuthorId)
         .OnDelete(DeleteBehavior.SetNull);
+
+      modelBuilder.Entity<UserLikeBlog>()
+        .HasKey(ulb => new { ulb.UserId, ulb.BlogId });
+
+      modelBuilder.Entity<UserLikeBlog>()
+          .HasOne(ulb => ulb.User)
+          .WithMany(u => u.LikedBlogs)
+          .HasForeignKey(ulb => ulb.UserId)
+          .OnDelete(DeleteBehavior.Cascade);
+
+      modelBuilder.Entity<UserLikeBlog>()
+          .HasOne(ulb => ulb.Blog)
+          .WithMany(b => b.LikedUsers)
+          .HasForeignKey(ulb => ulb.BlogId)
+          .OnDelete(DeleteBehavior.Cascade);
 
       // Seed roles
       var adminRole = new Role { Id = 1, Name = "admin" };
