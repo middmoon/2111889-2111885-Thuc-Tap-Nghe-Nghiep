@@ -86,10 +86,16 @@ namespace server.Controllers
           .FirstOrDefaultAsync(u => u.Username == model.Username);
 
       if (user == null)
+      {
+        Console.WriteLine("11111111 ::::::: Tài khoản chưa tồn tại");
         return Unauthorized(new { Message = "Tài khoản chưa tồn tại" });
+      }
 
       if (!user.VerifyPassword(model.Password))
+      {
+        Console.WriteLine("22222222 ::::::: Mật khẩu hoặc tài khoản không chính xác");
         return Unauthorized(new { Message = "Mật khẩu hoặc tài khoản không chính xác" });
+      }
 
       var userRoles = await _context.UserRoles
           .Where(ur => ur.UserId == user.Id)

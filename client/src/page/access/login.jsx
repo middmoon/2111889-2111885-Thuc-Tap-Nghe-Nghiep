@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import withLayout from "../../layout/withLayout";
 import { Flex, Form, Input, Button } from "antd";
-import axios from "axios";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../features/auth/authSlice";
@@ -10,35 +9,35 @@ import { loginUser } from "../../features/auth/authSlice";
 const Login = () => {
   const [openError, setOpenError] = useState(false);
   const navigate = useNavigate();
-  // use React Hooks
   const dispatch = useDispatch();
-  const { isAuthenticated, status, error } = useSelector((state) => state.auth);
+  const { isAuthenticated, status } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated && status === "succeeded") {
+      navigate("/");
+    }
+  }, [isAuthenticated, status, navigate]);
 
   const onFinish = async (values) => {
     try {
       await dispatch(loginUser(values)).unwrap();
-      navigate("/");
     } catch (err) {
       setOpenError(true);
-      console.error("Login Failed:", err);
       setTimeout(() => setOpenError(false), 3000);
+      console.error("Login Failed:", err);
     }
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
+    setOpenError(true);
+    setTimeout(() => setOpenError(false), 3000);
   };
 
   return (
     <>
       <div className="flex justify-center items-center p-3">
-        <Flex
-          vertical
-          justify="center"
-          align="center"
-          className="p-7 rounded-md "
-          style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}
-        >
+        <Flex vertical justify="center" align="center" className="p-7 rounded-md " style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}>
           <p className="pb-5 text-[25px]">Đăng nhập</p>
           <Form
             name="basic"

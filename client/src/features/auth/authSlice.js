@@ -1,18 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosClient from "../../utils/axiosClient";
 
-export const loginUser = createAsyncThunk(
-  "auth/login",
-  async (credentials, { rejectWithValue }) => {
-    try {
-      const response = await axiosClient.post("/auth/login", credentials);
-      sessionStorage.setItem("userData", JSON.stringify(response.data));
-      return true;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Login failed");
-    }
+export const loginUser = createAsyncThunk("auth/login", async (credentials, { rejectWithValue }) => {
+  try {
+    const response = await axiosClient.post("/auth/login", credentials);
+    sessionStorage.setItem("userData", JSON.stringify(response.data));
+    return true;
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Login failed";
+    return rejectWithValue(errorMessage);
   }
-);
+});
 
 export const logoutUser = createAsyncThunk("auth/logout", async () => {
   await axiosClient.delete("/auth/logout");
@@ -32,7 +30,7 @@ const authSlice = createSlice({
         state.status = "succeeded";
       })
       .addCase(loginUser.rejected, (state, action) => {
-        console.log("Đăng nhập thất bại");
+        console.log("Đăng nhập thất bại", action.payload);
         state.isAuthenticated = false;
         state.error = action.payload;
       })
