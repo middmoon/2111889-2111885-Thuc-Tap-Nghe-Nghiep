@@ -70,13 +70,14 @@ namespace server.Controllers
         {
             var blogs = await _context.Blog
                 .Where(b => b.IsApproved)
+                .Include(b => b.LikedUsers)
                 .Select(b => new BlogFormat
                 {
                     Id = b.Id,
                     Title = b.Title,
                     Content = b.Content,
                     Author = b.Author.Username,
-                    Likes = b.LikedUsers.Count(ulb => ulb.BlogId == b.Id),
+                    Likes = b.LikedUsers.Count(),
                     CreatedAt = b.CreatedAt,
                     UpdatedAt = b.UpdatedAt
                 })
@@ -196,7 +197,7 @@ namespace server.Controllers
                 BlogId = id
             };
 
-            _context.UserLikeBlogs.Add(userLikeBlog);
+            _context.UserLikeBlog.Add(userLikeBlog);
 
             try
             {
@@ -222,7 +223,7 @@ namespace server.Controllers
         public async Task<IActionResult> GetPendingApprovalBlogs()
         {
             var blogs = await _context.Blog
-                .Where(b => !b.IsApproved)
+                .Where(b => b.IsApproved != true)
                 .Select(b => new BlogFormat
                 {
                     Id = b.Id,

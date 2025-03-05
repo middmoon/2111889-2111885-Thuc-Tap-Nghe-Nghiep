@@ -15,7 +15,7 @@ namespace server.Data
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
 
-    public DbSet<UserLikeBlog> UserLikeBlogs { get; set; }
+    public DbSet<UserLikeBlog> UserLikeBlog { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
