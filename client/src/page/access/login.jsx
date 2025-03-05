@@ -100,7 +100,7 @@ const Login = () => {
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true, amount: 0.3 }}
-            className="absolute max-h-[40px] bottom-10 left-3/2 md:top-20 md:right-10 px-4 py-2 bg-red-500 text-white rounded-md"
+            className="!mb-0 absolute max-h-[40px] bottom-10 left-3/2 md:top-20 md:right-10 pt-3 pb-1 px-2 bg-red-500 text-white rounded-md"
           >
             Lỗi đăng nhập
           </motion.div>
