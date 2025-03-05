@@ -19,7 +19,7 @@ namespace server.Models
     [JsonIgnore]
     public ICollection<UserLikeBlog> LikedBlogs { get; set; } = new List<UserLikeBlog>();
     [JsonIgnore]
-    public ICollection<EditorApply> EditorApplications { get; set; }
+    public ICollection<EditorApply> EditorApplication { get; set; }
     public void SetPassword(string password)
     {
       var hasher = new PasswordHasher<User>();

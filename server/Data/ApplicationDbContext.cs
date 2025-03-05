@@ -14,9 +14,8 @@ namespace server.Data
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
-
     public DbSet<UserLikeBlog> UserLikeBlog { get; set; }
-
+    public DbSet<EditorApply> EditorApply { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -62,6 +61,13 @@ namespace server.Data
           .HasForeignKey(ulb => ulb.BlogId)
           .OnDelete(DeleteBehavior.Cascade);
 
+      modelBuilder.Entity<EditorApply>()
+              .HasKey(e => e.UserId);
+
+      modelBuilder.Entity<EditorApply>()
+          .HasOne(e => e.User)
+          .WithMany(u => u.EditorApplication)
+          .HasForeignKey(e => e.UserId);
       // Seed roles
       var adminRole = new Role { Id = 1, Name = "admin" };
       var readerRole = new Role { Id = 2, Name = "reader" };
