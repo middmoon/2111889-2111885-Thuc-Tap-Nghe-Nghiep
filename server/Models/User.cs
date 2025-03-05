@@ -18,6 +18,8 @@ namespace server.Models
     public virtual ICollection<Blog> Blogs { get; set; } = new List<Blog>();
     [JsonIgnore]
     public ICollection<UserLikeBlog> LikedBlogs { get; set; } = new List<UserLikeBlog>();
+    [JsonIgnore]
+    public ICollection<EditorApply> EditorApplications { get; set; }
     public void SetPassword(string password)
     {
       var hasher = new PasswordHasher<User>();
