@@ -1,15 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosClient from "../../utils/axiosClient";
 
-export const loginUser = createAsyncThunk("auth/login", async (credentials, { rejectWithValue }) => {
-  try {
-    const response = await axiosClient.post("/auth/login", credentials);
-    sessionStorage.setItem("userData", JSON.stringify(response.data));
-    return true;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || "Login failed");
+export const loginUser = createAsyncThunk(
+  "auth/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await axiosClient.post("/auth/login", credentials);
+      sessionStorage.setItem("userData", JSON.stringify(response.data));
+      return true;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Login failed");
+    }
   }
-});
+);
 
 export const logoutUser = createAsyncThunk("auth/logout", async () => {
   await axiosClient.delete("/auth/logout");

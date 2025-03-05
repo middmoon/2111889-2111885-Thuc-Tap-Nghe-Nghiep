@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Flex } from "antd";
+import { Button, Flex, Dropdown, Space, DownOutlined } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDevice } from "../hooks/useDevice";
 import MobileHeader from "./mobile/headerMobile";
@@ -34,12 +34,46 @@ export const Header = () => {
 
   const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    dispatch(logoutUser());
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
     setCurrentUser(null);
     navigate("/");
+    window.location.reload();
   };
 
+  //data
+  const items = [
+    {
+      key: "profile",
+      label: "Profile",
+      onClick: () => navigate("/profile"),
+    },
+    ...(currentUser?.roles?.includes("writer")
+      ? [
+          {
+            key: "5",
+            label: "Đăng bài",
+            onClick: () => navigate("/create-post"),
+          },
+        ]
+      : []),
+    ...(currentUser?.roles?.includes("reader")
+      ? [
+          {
+            key: "5",
+            label: "Đăng kí tác giả",
+          },
+        ]
+      : []),
+    {
+      type: "divider",
+    },
+    {
+      key: "logout",
+      label: "Đăng xuất",
+      onClick: handleLogout,
+    },
+  ];
   return (
     <>
       {isMobile ? (
@@ -47,17 +81,21 @@ export const Header = () => {
       ) : (
         <div className="w-full flex justify-center items-center">
           <div className="flex justify-between items-center w-full max-h-[200px] max-w-[1500px] p-3">
-            <p onClick={() => navigate("/")} className="flex justify-center items-center text-[20px] px-3  rounded-[50px] bg-blue-500 text-white">
+            <p
+              onClick={() => navigate("/")}
+              className="flex justify-center items-center text-[20px] px-3  rounded-[50px] bg-blue-500 text-white cursor-pointer"
+            >
               B
             </p>
             {currentUser ? (
               <>
                 <div className="flex gap-3 items-center justify-center">
-                  <div className="text-[14px]" onClick={() => setIsOpen(!isOpen)}>
-                    Hello, {currentUser.user}
-                  </div>
-                  {currentUser.roles?.includes("writer") && <Button onClick={() => navigate("/create-post")}>Đăng bài</Button>}
-                  <Button onClick={handleLogout}>Đăng xuất</Button>
+                  {/* Dropdown Menu */}
+                  <Dropdown menu={{ items }} trigger={["click"]}>
+                    <a onClick={(e) => e.preventDefault()}>
+                      <Space>Hello, {currentUser.user}</Space>
+                    </a>
+                  </Dropdown>
                 </div>
               </>
             ) : (

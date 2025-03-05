@@ -10,46 +10,24 @@ import { loginUser } from "../../features/auth/authSlice";
 const Login = () => {
   const [openError, setOpenError] = useState(false);
   const navigate = useNavigate();
-  //Login method
-  // const onFinish = async (values) => {
-  //   try {
-  //     const response = await axios.post("https://localhost:5001/api/auth/login", values, { withCredentials: true });
-  //     console.log("Response:", response.data);
-  //     sessionStorage.setItem("userData", JSON.stringify(response.data));
-  //     navigate("/");
-  //   } catch (error) {
-  //     setOpenError(true);
-  //     console.error("Error:", error);
-  //     setTimeout(() => {
-  //       setOpenError(false);
-  //     }, 2000);
-  //   }
-  // };
-
   // use React Hooks
   const dispatch = useDispatch();
   const { isAuthenticated, status, error } = useSelector((state) => state.auth);
 
-  const onFinish = (values) => {
-    dispatch(loginUser(values));
+  const onFinish = async (values) => {
+    try {
+      await dispatch(loginUser(values)).unwrap();
+      navigate("/");
+    } catch (err) {
+      setOpenError(true);
+      console.error("Login Failed:", err);
+      setTimeout(() => setOpenError(false), 3000);
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (error) {
-      setOpenError(true);
-      setTimeout(() => setOpenError(false), 3000);
-    }
-  }, [error]);
 
   return (
     <>

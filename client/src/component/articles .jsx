@@ -1,11 +1,12 @@
 import React from "react";
-import { Layout, Card, Row, Col, Typography, Image } from "antd";
+import { Card, Typography, Image } from "antd";
 import { format } from "date-fns";
-import { articles } from "../data/data";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { imageList } from "../data/data";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { LikeFilled } from "@ant-design/icons";
 const { Title, Text } = Typography;
 const shuffleArray = (array) => {
   let shuffled = [...array];
@@ -18,8 +19,12 @@ const shuffleArray = (array) => {
 
 const ArticlesPage = () => {
   //state
+  const [currentUser, setCurrentUser] = useState(
+    JSON.parse(sessionStorage.getItem("userData"))
+  );
   const [randomImages, setRandomImages] = useState([]);
-
+  const [likes, setLikes] = useState(false);
+  const navigate = useNavigate();
   //Effect, API call
   const [blogs, setBlogs] = useState([]);
 
@@ -47,7 +52,16 @@ const ArticlesPage = () => {
     );
     setRandomImages(shuffledImages);
   }, []);
-
+  //navigate
+  const handleClick = (id) => {
+    navigate(`/detail/${id}`);
+  };
+  //latesBlog
+  const latestBlog = blogs?.reduce((latest, blog) => {
+    return new Date(blog.createdAt) > new Date(latest.createdAt)
+      ? blog
+      : latest;
+  }, blogs[0]);
   //Log test
 
   return (
@@ -71,15 +85,45 @@ const ArticlesPage = () => {
               />
             }
           >
-            <Text type="secondary">Kungai ,</Text>
-            <Text type="secondary">
-              {blogs[0]?.createdAt
-                ? format(new Date(blogs[0].createdAt), "yyyy-MM-dd")
-                : "N/A"}
-            </Text>
+            <div className="flex w-full justify-between items-center">
+              <div>
+                {" "}
+                <Text type="secondary">
+                  <span className="font-bold ">Tác giả: </span>
+                  {latestBlog?.author} <br />
+                </Text>
+                <Text type="secondary">
+                  <span className="font-bold ">Ngày đăng: </span>
+                  {latestBlog?.createdAt
+                    ? format(new Date(latestBlog.createdAt), "yyyy-MM-dd")
+                    : "N/A"}{" "}
+                  <br />
+                </Text>
+                <Text type="secondary">
+                  <span className="font-bold ">Lượt thích: </span>{" "}
+                  {latestBlog?.likes}{" "}
+                </Text>
+              </div>
+              <div>
+                {currentUser && (
+                  <LikeFilled
+                    onClick={() => setLikes(!likes)}
+                    className={`text-[30px] ${
+                      likes ? "text-blue-500" : "text-gray-500"
+                    }`}
+                  />
+                )}
+              </div>
+            </div>
 
-            <Title level={4}>{blogs[9]?.title}</Title>
-            <Text>{blogs[9]?.content}</Text>
+            <Title
+              level={4}
+              onClick={() => handleClick(latestBlog?.id)}
+              className="pt-2 cursor-pointer select-none"
+            >
+              {latestBlog?.title}
+            </Title>
+            <Text className="select-none">{latestBlog?.content}</Text>
           </Card>
         </motion.div>
 
@@ -98,6 +142,7 @@ const ArticlesPage = () => {
             <div
               key={index}
               className="flex flex-col sm:flex-row items-center gap-3 border p-3 "
+              onClick={() => handleClick(article.id)}
             >
               {/* Hình ảnh */}
               <img
@@ -114,7 +159,7 @@ const ArticlesPage = () => {
                     ? format(new Date(article.createdAt), "yyyy-MM-dd")
                     : "N/A"}
                 </Text>
-                <Title level={4} className="text-lg sm:text-xl">
+                <Title level={4} className="text-lg sm:text-xl cursor-pointer">
                   {article.title}
                 </Title>
                 <Text className="line-clamp-3">{article.content}</Text>

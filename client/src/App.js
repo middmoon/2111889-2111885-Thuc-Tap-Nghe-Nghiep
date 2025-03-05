@@ -18,7 +18,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/test" element={<Test />} />
-          <Route path="/Detail" element={<PostDetail />} />
+          <Route path="/detail/:id" element={<PostDetail />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/redux-counter" element={<Counter />} />
         </Routes>
