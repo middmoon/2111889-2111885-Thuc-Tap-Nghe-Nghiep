@@ -69,6 +69,7 @@ namespace server.Controllers
         public async Task<ActionResult<IEnumerable<BlogFormat>>> GetBlog()
         {
             var blogs = await _context.Blog
+                .Where(b => b.IsApproved)
                 .Select(b => new BlogFormat
                 {
                     Id = b.Id,
@@ -214,6 +215,27 @@ namespace server.Controllers
             }
 
             return Ok(existingBlog);
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpGet("pending-approval")]
+        public async Task<IActionResult> GetPendingApprovalBlogs()
+        {
+            var blogs = await _context.Blog
+                .Where(b => !b.IsApproved)
+                .Select(b => new BlogFormat
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Content = b.Content,
+                    Author = b.Author.Username,
+                    Likes = b.LikedUsers.Count(ulb => ulb.BlogId == b.Id),
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt
+                })
+                .ToListAsync();
+
+            return Ok(blogs);
         }
 
         [Authorize(Policy = "Admin")]

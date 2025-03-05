@@ -67,7 +67,7 @@ namespace server.Controllers
         }
       }
 
-      return Ok(new { message = "User added as editor successfully.", user = existingUser });
+      return Ok(new { user = existingUser });
     }
 
     [Authorize]
