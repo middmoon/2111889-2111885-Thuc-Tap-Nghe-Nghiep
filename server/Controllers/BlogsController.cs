@@ -65,9 +65,13 @@ namespace server.Controllers
         }
 
         // GET: api/blogs
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BlogFormat>>> GetBlog()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? userId = string.IsNullOrEmpty(userIdClaim) ? null : int.Parse(userIdClaim);
+
             var blogs = await _context.Blog
                 .Where(b => b.IsApproved)
                 .Include(b => b.LikedUsers)
@@ -77,6 +81,7 @@ namespace server.Controllers
                     Title = b.Title,
                     Content = b.Content,
                     Author = b.Author.Username,
+                    IsLiked = userId.HasValue && b.LikedUsers.Any(ulb => ulb.UserId == userId),
                     Likes = b.LikedUsers.Count(),
                     CreatedAt = b.CreatedAt,
                     UpdatedAt = b.UpdatedAt
@@ -334,6 +339,7 @@ namespace server.Controllers
         public string Content { get; set; }
         public string Author { get; set; }
         public int Likes { get; set; }
+        public bool IsLiked { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
