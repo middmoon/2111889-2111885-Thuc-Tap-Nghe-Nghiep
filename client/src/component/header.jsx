@@ -58,6 +58,15 @@ export const Header = () => {
           },
         ]
       : []),
+    ...(currentUser?.roles?.includes("writer")
+      ? [
+          {
+            key: "8",
+            label: "Danh sách bài viết của tôi",
+            onClick: () => navigate("/my-blogs"),
+          },
+        ]
+      : []),
     ...(currentUser?.roles?.includes("admin")
       ? [
           {

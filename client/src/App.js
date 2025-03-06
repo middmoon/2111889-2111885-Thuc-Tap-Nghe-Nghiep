@@ -8,6 +8,7 @@ import Counter from "./features/counter/counter";
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import CreatePost from "./page/createPost";
+import MyBlog from "./page/myBlog";
 function App() {
   return (
     <div className="App">
@@ -21,6 +22,7 @@ function App() {
           <Route path="/detail/:id" element={<PostDetail />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/redux-counter" element={<Counter />} />
+          <Route path="/my-blogs" element={<MyBlog />} />
         </Routes>
       </Router>
     </div>
