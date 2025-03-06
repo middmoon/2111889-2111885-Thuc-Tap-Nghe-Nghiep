@@ -1,32 +1,38 @@
 import React, { useEffect, useState } from "react";
+import { message, List } from "antd";
+import PendingBlog from "../component/pendingBlog";
+import axiosClient from "../utils/axiosClient";
 import withLayout from "../layout/withLayout";
 
-import axiosClient from "../utils/axiosClient";
+const PendingBlogPage = () => {
+  const [blogs, setBlogs] = useState([]);
 
-const PendingBlog = () => {
-  const [pendingBlogs, setPendingBlogs] = useState([]);
-  //fetch blog
   useEffect(() => {
-    const fetchBlog = async () => {
+    const fetchBlogs = async () => {
       try {
-        const response = await axiosClient.get("https://localhost:5001/api/blogs");
-        setPendingBlogs(response.data);
+        const response = await axiosClient.get("/blogs/pending-approval");
+        setBlogs(response.data);
       } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu blog:", error);
+        console.log(error);
+        message.error("Lỗi tải danh sách bài viết");
       }
     };
-    fetchBlog();
+    fetchBlogs();
   }, []);
 
-  console.log(pendingBlogs);
+  const handleApprove = (id) => {
+    setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog.id !== id));
+  };
 
   return (
-    <div className="w-full flex flex-col justify-center items-center">
-      <div className=" max-w-[1500px] w-full">
-        <p>Đang chờ duyệt</p>
+    <>
+      <div className="flex justify-center mt-5">
+        <div className="w-3/5 max-w-2xl">
+          <List dataSource={blogs} renderItem={(blog) => <PendingBlog key={blog.id} blog={blog} onApprove={handleApprove} />} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default withLayout(PendingBlog);
+export default withLayout(PendingBlogPage);

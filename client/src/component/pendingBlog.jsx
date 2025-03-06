@@ -1,23 +1,32 @@
 import React from "react";
+import { Card, Button, message } from "antd";
+import axiosClient from "../utils/axiosClient";
+import { format } from "date-fns";
 
-const PendingBlog = () => {
+const PendingBlog = ({ blog, onApprove }) => {
+  const handleApprove = async () => {
+    try {
+      const response = await axiosClient.put(`/blogs/approve/${blog.id}`);
+      if (response.status === 200) {
+        message.success("Bài viết đã được duyệt");
+        onApprove(blog.id);
+      } else {
+        message.error("Lỗi khi duyệt bài viết");
+      }
+    } catch (error) {
+      message.error("Lỗi kết nối đến server");
+    }
+  };
+
   return (
-    <div className="flex flex-col  min-h-screen ">
-      <div className="w-full flex gap-3">
-        <div className="flex-1 bg-red-500 p-2 rounded-lg" style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}>
-          <p className="!mb-0 text-[14px] font-[600]">Tất cả bài viết của tôi</p>
-          <div className="p-2 w-full rounded-lg border-[1px] border-dashed flex flex-wrap gap-3">
-            <div className="w-[calc(50%-6px)] h-[200px] bg-white rounded-lg">a</div>
-            <div className="w-[calc(50%-6px)] h-[200px] bg-white rounded-lg">a</div>
-            <div className="w-[calc(50%-6px)] h-[200px] bg-white rounded-lg">a</div>
-            <div className="w-[calc(50%-6px)] h-[200px] bg-white rounded-lg">a</div>
-          </div>
-        </div>
-        <div className="flex-1 bg-green-500 p-2 rounded-lg" style={{ boxShadow: "rgba(0, 0, 0, 0.35) 0px 5px 15px" }}>
-          a
-        </div>
-      </div>
-    </div>
+    <Card title={blog.title} extra={<span>Tác giả: {blog.author}</span>} style={{ marginBottom: 16 }}>
+      <p>Ngày đăng: {blog?.createdAt ? format(new Date(blog.createdAt), "yyyy-MM-dd") : "N/A"}</p>
+      <br />
+      <p>{blog.content}</p>
+      <Button type="primary" onClick={handleApprove}>
+        Duyệt bài
+      </Button>
+    </Card>
   );
 };
 

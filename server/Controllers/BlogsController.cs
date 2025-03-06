@@ -232,8 +232,8 @@ namespace server.Controllers
 
         // PUT api/like/{id}
         // Like blog by user
-        [Authorize]
-        [HttpPut("like/{id}")]
+        [Authorize(Policy = "Reader")]
+        [HttpPost("like/{id}")]
         public async Task<IActionResult> LikeBlog(int id)
         {
             // check claim NameIdentifier in token
@@ -246,7 +246,9 @@ namespace server.Controllers
             // check existing blog
             if (!BlogExists(id)) return NotFound($"Blog with ID {id} not found.");
 
-            var existingBlog = await _context.Blog.FindAsync(id);
+            var existingBlog = await _context.Blog
+                                        .Include(b => b.LikedUsers)
+                                        .FirstOrDefaultAsync(b => b.Id == id);
 
             // check if user already liked blog
             if (existingBlog.LikedUsers.Any(ulb => ulb.UserId == userId)) return BadRequest("You already liked this blog.");
@@ -276,7 +278,7 @@ namespace server.Controllers
                 }
             }
 
-            return Ok(existingBlog);
+            return Ok(userLikeBlog);
         }
 
         // PUT api/approve/{id}

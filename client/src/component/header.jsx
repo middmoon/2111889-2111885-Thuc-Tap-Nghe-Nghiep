@@ -61,7 +61,7 @@ export const Header = () => {
           {
             key: "approve-blog",
             label: "Duyệt bài",
-            onClick: () => navigate("/create-post"),
+            onClick: () => navigate("/pending-blogs"),
           },
           {
             key: "approve-editor",
