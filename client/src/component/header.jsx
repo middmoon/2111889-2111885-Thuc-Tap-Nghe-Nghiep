@@ -29,7 +29,6 @@ export const Header = () => {
     return () => window.removeEventListener("userUpdated", handleUserUpdate);
   }, []);
 
-  console.log(currentUser);
   // logout using redux
 
   const dispatch = useDispatch();
@@ -83,7 +82,7 @@ export const Header = () => {
           {
             key: "my-blogs",
             label: "Bài viết của tôi",
-            onClick: () => navigate("/create-post"),
+            onClick: () => navigate("/my-blogs"),
           },
         ]
       : []),
