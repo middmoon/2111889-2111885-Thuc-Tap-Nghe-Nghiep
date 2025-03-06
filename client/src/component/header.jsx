@@ -48,6 +48,7 @@ export const Header = () => {
       label: "Profile",
       onClick: () => navigate("/profile"),
     },
+
     ...(currentUser?.roles?.includes("writer")
       ? [
           {
@@ -57,7 +58,25 @@ export const Header = () => {
           },
         ]
       : []),
-    ...(currentUser?.roles?.includes("reader")
+    ...(currentUser?.roles?.includes("admin")
+      ? [
+          {
+            key: "6",
+            label: "Duyệt bài",
+            onClick: () => navigate("/create-post"),
+          },
+        ]
+      : []),
+    ...(currentUser?.roles?.includes("admin")
+      ? [
+          {
+            key: "7",
+            label: "Duyệt tác giả",
+            onClick: () => navigate("/create-post"),
+          },
+        ]
+      : []),
+    ...(!currentUser?.roles?.includes("writer")
       ? [
           {
             key: "5",
