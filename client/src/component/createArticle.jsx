@@ -1,25 +1,18 @@
 import React from "react";
 import { Form, Input, Button, message } from "antd";
-import axios from "axios";
-import { getCookie } from "../layout/cookie";
+import axiosClient from "../utils/axiosClient";
 const CreateArticle = () => {
-  const accessToken = getCookie("token");
-
   const [form] = Form.useForm();
-  console.log(accessToken);
+
   const handleSubmit = async (values) => {
     console.log("Dữ liệu gửi đi:", values);
+
     try {
-      const headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      };
-      const response = await axios.post(
+      const response = await axiosClient.post(
         "https://localhost:5001/api/blogs",
         values,
         {
           withCredentials: true,
-          headers: headers,
         }
       );
       console.log("Response:", response.data);

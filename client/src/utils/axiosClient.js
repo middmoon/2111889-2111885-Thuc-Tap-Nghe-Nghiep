@@ -10,8 +10,9 @@ const axiosClient = axios.create({
 });
 
 const getToken = () => {
-  const storedUser = sessionStorage.getItem("userData");
+  const storedUser = JSON.parse(sessionStorage.getItem("userData"));
   const token = storedUser ? storedUser.token : null;
+  console.log(token);
   return token;
 };
 
