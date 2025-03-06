@@ -9,6 +9,8 @@ import Counter from "./features/counter/counter";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import CreatePost from "./page/createPost";
 import MyBlog from "./page/myBlog";
+import PendingBlog from "./page/pendingBlog";
+
 function App() {
   return (
     <div className="App">
@@ -23,6 +25,7 @@ function App() {
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/redux-counter" element={<Counter />} />
           <Route path="/my-blogs" element={<MyBlog />} />
+          <Route path="/pending-blogs" element={<PendingBlog />} />
         </Routes>
       </Router>
     </div>
