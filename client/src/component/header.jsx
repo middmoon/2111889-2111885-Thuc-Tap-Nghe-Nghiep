@@ -29,7 +29,6 @@ export const Header = () => {
     return () => window.removeEventListener("userUpdated", handleUserUpdate);
   }, []);
 
-  console.log(currentUser);
   // logout using redux
 
   const dispatch = useDispatch();
