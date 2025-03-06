@@ -171,6 +171,93 @@ namespace server.Controllers
             return CreatedAtAction("GetBlog", new { id = blog.Id }, blog);
         }
 
+        // POST api/like/{id}
+        // Like blog by user
+        [Authorize(Policy = "Reader")]
+        [HttpPost("like/{id}")]
+        public async Task<IActionResult> LikeBlog(int id)
+        {
+            // check claim NameIdentifier in token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null) return Unauthorized("User id not found in token.");
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            // check existing blog
+            if (!BlogExists(id)) return NotFound($"Blog with ID {id} not found.");
+
+            var existingBlog = await _context.Blog.FindAsync(id);
+            if (existingBlog == null) return NotFound($"Blog with ID {id} not found.");
+
+
+            // check if user already liked blog
+            var likeRecord = await _context.UserLikeBlog.FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.BlogId == id);
+            if (likeRecord != null) return BadRequest("You already liked this blog.");
+
+            // like blog
+            var userLikeBlog = new UserLikeBlog
+            {
+                UserId = userId,
+                BlogId = id
+            };
+
+            _context.UserLikeBlog.Add(userLikeBlog);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (!BlogExists(id))
+                {
+                    return NotFound($"Blog with ID {id} not found.");
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return Ok(userLikeBlog);
+        }
+
+        [Authorize(Policy = "Reader")]
+        [HttpDelete("unlike/{id}")]
+        public async Task<IActionResult> UnlikeBlog(int id)
+        {
+            // Check claim NameIdentifier in token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null) return Unauthorized("User id not found in token.");
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            // Check if blog exists
+            var existingBlog = await _context.Blog.FindAsync(id);
+            if (existingBlog == null) return NotFound($"Blog with ID {id} not found.");
+
+            // Find the like record
+            var likeRecord = await _context.UserLikeBlog
+                .FirstOrDefaultAsync(ulb => ulb.UserId == userId && ulb.BlogId == id);
+
+            if (likeRecord == null) return BadRequest("You have not liked this blog yet.");
+
+            // Remove like
+            _context.UserLikeBlog.Remove(likeRecord);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, "Database error: " + ex.Message);
+            }
+
+            return Ok(new { message = "Unlike successful", blogId = id, userId = userId });
+        }
+
         // PUT: api/blogs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Policy = "Writer")]
@@ -230,56 +317,6 @@ namespace server.Controllers
             return Ok(existingBlog);
         }
 
-        // PUT api/like/{id}
-        // Like blog by user
-        [Authorize(Policy = "Reader")]
-        [HttpPost("like/{id}")]
-        public async Task<IActionResult> LikeBlog(int id)
-        {
-            // check claim NameIdentifier in token
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-
-            if (userIdClaim == null) return Unauthorized("User id not found in token.");
-
-            int userId = int.Parse(userIdClaim.Value);
-
-            // check existing blog
-            if (!BlogExists(id)) return NotFound($"Blog with ID {id} not found.");
-
-            var existingBlog = await _context.Blog
-                                        .Include(b => b.LikedUsers)
-                                        .FirstOrDefaultAsync(b => b.Id == id);
-
-            // check if user already liked blog
-            if (existingBlog.LikedUsers.Any(ulb => ulb.UserId == userId)) return BadRequest("You already liked this blog.");
-
-            // like blog
-            var userLikeBlog = new UserLikeBlog
-            {
-                UserId = userId,
-                BlogId = id
-            };
-
-            _context.UserLikeBlog.Add(userLikeBlog);
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (!BlogExists(id))
-                {
-                    return NotFound($"Blog with ID {id} not found.");
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return Ok(userLikeBlog);
-        }
 
         // PUT api/approve/{id}
         // Get pemnding approve blogs by admin user
