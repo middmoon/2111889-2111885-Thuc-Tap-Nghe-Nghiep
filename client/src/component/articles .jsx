@@ -7,6 +7,7 @@ import { imageList } from "../data/data";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { LikeFilled } from "@ant-design/icons";
+import axiosClient from "../utils/axiosClient";
 const { Title, Text } = Typography;
 const shuffleArray = (array) => {
   let shuffled = [...array];
@@ -23,14 +24,32 @@ const ArticlesPage = () => {
     JSON.parse(sessionStorage.getItem("userData"))
   );
   const [randomImages, setRandomImages] = useState([]);
-  const [likes, setLikes] = useState(false);
+
   const navigate = useNavigate();
+
+  // handle like
+  const handleLike = async (id) => {
+    try {
+      const response = await axiosClient.post(`/blogs/like/${id}`);
+
+      if (response.status === 200) {
+        setBlogs((prevBlogs) =>
+          prevBlogs.map((blog) =>
+            blog.id === id ? { ...blog, isLiked: !blog.isLiked } : blog
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Lỗi khi like bài viết:", error);
+    }
+  };
+
   //Effect, API call
   const [blogs, setBlogs] = useState([]);
 
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get("https://localhost:5001/api/blogs");
+      const response = await axiosClient.get("/blogs");
       setBlogs(response.data);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu blog:", error);
@@ -63,7 +82,7 @@ const ArticlesPage = () => {
       : latest;
   }, blogs[0]);
   //Log test
-
+  console.log(blogs);
   return (
     <>
       <div className="w-full h-[2px] bg-gray-300 mb-5" />
@@ -107,9 +126,12 @@ const ArticlesPage = () => {
               <div>
                 {currentUser && (
                   <LikeFilled
-                    onClick={() => setLikes(!likes)}
-                    className={`text-[30px] ${
-                      likes ? "text-blue-500" : "text-gray-500"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLike(latestBlog?.id);
+                    }}
+                    className={`text-[20px] cursor-pointer ${
+                      latestBlog?.isLiked ? "text-blue-500" : "text-gray-500"
                     }`}
                   />
                 )}
@@ -153,12 +175,25 @@ const ArticlesPage = () => {
 
               {/* Nội dung bài viết */}
               <div className="w-full sm:w-[calc(100%-160px)] flex flex-col justify-center">
-                <Text type="secondary">
-                  {" "}
-                  {article?.createdAt
-                    ? format(new Date(article.createdAt), "yyyy-MM-dd")
-                    : "N/A"}
-                </Text>
+                <div className="w-full flex justify-between items-center">
+                  <Text type="secondary">
+                    {" "}
+                    {article?.createdAt
+                      ? format(new Date(article.createdAt), "yyyy-MM-dd")
+                      : "N/A"}
+                  </Text>
+                  {currentUser && (
+                    <LikeFilled
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLike(article?.id);
+                      }}
+                      className={`text-[15px] cursor-pointer ${
+                        article.isLiked ? "text-blue-500" : "text-gray-500"
+                      }`}
+                    />
+                  )}
+                </div>
                 <Title level={4} className="text-lg sm:text-xl cursor-pointer">
                   {article.title}
                 </Title>
