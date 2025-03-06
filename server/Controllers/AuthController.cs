@@ -87,13 +87,11 @@ namespace server.Controllers
 
       if (user == null)
       {
-        Console.WriteLine("11111111 ::::::: Tài khoản chưa tồn tại");
         return Unauthorized(new { Message = "Tài khoản chưa tồn tại" });
       }
 
       if (!user.VerifyPassword(model.Password))
       {
-        Console.WriteLine("22222222 ::::::: Mật khẩu hoặc tài khoản không chính xác");
         return Unauthorized(new { Message = "Mật khẩu hoặc tài khoản không chính xác" });
       }
 
