@@ -23,6 +23,113 @@ namespace server.Controllers
             _context = context;
         }
 
+        // GET: api/blogs
+        // Get all blog with approval true
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BlogFormat>>> GetBlog()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? userId = string.IsNullOrEmpty(userIdClaim) ? null : int.Parse(userIdClaim);
+
+            var blogs = await _context.Blog
+                .Where(b => b.IsApproved)
+                .Include(b => b.LikedUsers)
+                .Select(b => new BlogFormat
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Content = b.Content,
+                    Author = b.Author.Username,
+                    IsLiked = userId.HasValue && b.LikedUsers.Any(ulb => ulb.UserId == userId),
+                    Likes = b.LikedUsers.Count(),
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt
+                })
+                .ToListAsync();
+
+            return Ok(blogs);
+        }
+
+        // GET: api/blogs/5
+        // Get blog by id
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Blog>> GetBlog(int id)
+        {
+            var blog = await _context.Blog
+                .Where(b => b.Id == id)
+                .Select(b => new BlogFormat
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Content = b.Content,
+                    Author = b.Author.Username,
+                    Likes = b.LikedUsers.Count(),
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (blog == null)
+            {
+                return NotFound($"Blog with ID {id} not found.");
+            }
+
+            return Ok(blog);
+        }
+
+        // GET: api/my-blogs
+        // Get writer's blogs
+        [Authorize(Policy = "Writer")]
+        [HttpGet("my-blogs")]
+        public async Task<ActionResult<IEnumerable<BlogFormat>>> GetMyBlogs()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? userId = string.IsNullOrEmpty(userIdClaim) ? null : int.Parse(userIdClaim);
+
+            var blogs = await _context.Blog
+                .Where(b => b.AuthorId == userId)
+                .Select(b => new BlogFormat
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Content = b.Content,
+                    Author = b.Author.Username,
+                    Likes = b.LikedUsers.Count(),
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt
+                })
+                .ToListAsync();
+
+            return Ok(blogs);
+        }
+
+        // GET: api/my-favorite-blogs
+        // Get writer's blogs
+        [Authorize]
+        [HttpGet("my-favorite-blogs")]
+        public async Task<ActionResult<IEnumerable<BlogFormat>>> GetMyFavoriteBlogs()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int? userId = string.IsNullOrEmpty(userIdClaim) ? null : int.Parse(userIdClaim);
+
+            var blogs = await _context.Blog
+                .Where(b => b.LikedUsers.Any(ulb => ulb.UserId == userId))
+                .Select(b => new BlogFormat
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Content = b.Content,
+                    Author = b.Author.Username,
+                    Likes = b.LikedUsers.Count(),
+                    CreatedAt = b.CreatedAt,
+                    UpdatedAt = b.UpdatedAt
+                })
+                .ToListAsync();
+
+            return Ok(blogs);
+        }
+
         // POST: api/blogs
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize(Policy = "AdminOrWriter")]
@@ -62,59 +169,6 @@ namespace server.Controllers
             }
 
             return CreatedAtAction("GetBlog", new { id = blog.Id }, blog);
-        }
-
-        // GET: api/blogs
-        [AllowAnonymous]
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<BlogFormat>>> GetBlog()
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            int? userId = string.IsNullOrEmpty(userIdClaim) ? null : int.Parse(userIdClaim);
-
-            var blogs = await _context.Blog
-                .Where(b => b.IsApproved)
-                .Include(b => b.LikedUsers)
-                .Select(b => new BlogFormat
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Content = b.Content,
-                    Author = b.Author.Username,
-                    IsLiked = userId.HasValue && b.LikedUsers.Any(ulb => ulb.UserId == userId),
-                    Likes = b.LikedUsers.Count(),
-                    CreatedAt = b.CreatedAt,
-                    UpdatedAt = b.UpdatedAt
-                })
-                .ToListAsync();
-
-            return Ok(blogs);
-        }
-
-        // GET: api/blogs/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Blog>> GetBlog(int id)
-        {
-            var blog = await _context.Blog
-                .Where(b => b.Id == id)
-                .Select(b => new BlogFormat
-                {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Content = b.Content,
-                    Author = b.Author.Username,
-                    Likes = b.LikedUsers.Count(),
-                    CreatedAt = b.CreatedAt,
-                    UpdatedAt = b.UpdatedAt
-                })
-                .FirstOrDefaultAsync();
-
-            if (blog == null)
-            {
-                return NotFound($"Blog with ID {id} not found.");
-            }
-
-            return Ok(blog);
         }
 
         // PUT: api/blogs/5
@@ -176,6 +230,8 @@ namespace server.Controllers
             return Ok(existingBlog);
         }
 
+        // PUT api/like/{id}
+        // Like blog by user
         [Authorize]
         [HttpPut("like/{id}")]
         public async Task<IActionResult> LikeBlog(int id)
@@ -223,6 +279,8 @@ namespace server.Controllers
             return Ok(existingBlog);
         }
 
+        // PUT api/approve/{id}
+        // Get pemnding approve blogs by admin user
         [Authorize(Policy = "Admin")]
         [HttpGet("pending-approval")]
         public async Task<IActionResult> GetPendingApprovalBlogs()
@@ -244,6 +302,8 @@ namespace server.Controllers
             return Ok(blogs);
         }
 
+        // PUT api/approve/{id}
+        // Approve blog by admin user
         [Authorize(Policy = "Admin")]
         [HttpPut("approve/{id}")]
         public async Task<IActionResult> ApproveBlog(int id)

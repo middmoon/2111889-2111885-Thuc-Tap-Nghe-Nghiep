@@ -47,39 +47,41 @@ export const Header = () => {
       label: "Profile",
       onClick: () => navigate("/profile"),
     },
-
-    ...(currentUser?.roles?.includes("writer")
-      ? [
-          {
-            key: "5",
-            label: "Đăng bài",
-            onClick: () => navigate("/create-post"),
-          },
-        ]
-      : []),
-    ...(currentUser?.roles?.includes("writer")
-      ? [
-          {
-            key: "8",
-            label: "Danh sách bài viết của tôi",
-            onClick: () => navigate("/my-blogs"),
-          },
-        ]
-      : []),
+    {
+      key: "my-favorite-blogs",
+      label: "Bài viết yêu thích của tôi",
+      onClick: () => navigate("/my-blogs"),
+    },
     ...(currentUser?.roles?.includes("admin")
       ? [
           {
-            key: "6",
+            type: "divider",
+          },
+          {
+            key: "approve-blog",
             label: "Duyệt bài",
             onClick: () => navigate("/create-post"),
           },
+          {
+            key: "approve-editor",
+            label: "Duyệt tác giả",
+            onClick: () => navigate("/create-post"),
+          },
         ]
       : []),
-    ...(currentUser?.roles?.includes("admin")
+    ...(currentUser?.roles?.includes("writer")
       ? [
           {
-            key: "7",
-            label: "Duyệt tác giả",
+            type: "divider",
+          },
+          {
+            key: "post-blog",
+            label: "Đăng bài",
+            onClick: () => navigate("/create-post"),
+          },
+          {
+            key: "my-blogs",
+            label: "Bài viết của tôi",
             onClick: () => navigate("/create-post"),
           },
         ]
@@ -87,7 +89,10 @@ export const Header = () => {
     ...(!currentUser?.roles?.includes("writer")
       ? [
           {
-            key: "5",
+            type: "divider",
+          },
+          {
+            key: "register-editor",
             label: "Đăng kí tác giả",
           },
         ]
