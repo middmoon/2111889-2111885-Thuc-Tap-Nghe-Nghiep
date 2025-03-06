@@ -82,7 +82,7 @@ export const Header = () => {
           {
             key: "my-blogs",
             label: "Bài viết của tôi",
-            onClick: () => navigate("/create-post"),
+            onClick: () => navigate("/my-blogs"),
           },
         ]
       : []),
